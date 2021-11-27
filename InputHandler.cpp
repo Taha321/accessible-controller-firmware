@@ -1,31 +1,51 @@
 #include "InputHandler.h"
+#include <TeensyThreads.h>
 
-InputHandler::InputHandler(EventQueue<Event>& queue)
-{
+void InputHandler::begin(EventQueue<Event>& queue)
+{   
+    reset();  
     EQ = &queue;
     void (*ISR[])() = { ISR_PressA,ISR_PressB,ISR_PressX,ISR_PressY,ISR_PressRIGHT,ISR_PressLEFT,ISR_PressUP,ISR_PressDOWN,ISR_PressLT,ISR_PressRT };
-    for (unsigned int key = 0; key < nKeys; key++)
+    for (uint8_t key = 0; key < nButtons; key++)
     {
-        pinMode(pinAssignments[key], INPUT_PULLDOWN);
+        pinMode(pinAssignments[key], INPUT);
         attachInterrupt(pinAssignments[key], ISR[key], RISING);
     }
+    
+    RightJoyStick.codeX = RightJoyStick_X;
+    RightJoyStick.codeY = RightJoyStick_Y;
+
+    LeftJoyStick.codeX = LeftJoyStick_X;
+    LeftJoyStick.codeY = LeftJoyStick_Y;
+
+    pinMode(pinAssignments[RightJoyStick.codeX], INPUT);
+    pinMode(pinAssignments[RightJoyStick.codeY], INPUT);
+    pinMode(pinAssignments[LeftJoyStick.codeX], INPUT);
+    pinMode(pinAssignments[LeftJoyStick.codeY], INPUT);
+    
+    threads.addThread(TrackJoyStick, &RightJoyStick);
+    threads.addThread(TrackJoyStick, &LeftJoyStick);
 }
 
-InputHandler::InputHandler(EventQueue<Event>& queue, unsigned int* PinAssignments)
+void InputHandler::begin(EventQueue<Event>& queue, uint8_t* Pins)
 {
-    for (unsigned int i = 0; i < nKeys; i++)
-        pinAssignments[i] = PinAssignments[i];
-
-    EQ = &queue;
-    void (*ISR[])() = { ISR_PressA,ISR_PressB,ISR_PressX,ISR_PressY,ISR_PressRIGHT,ISR_PressLEFT,ISR_PressUP,ISR_PressDOWN,ISR_PressLT,ISR_PressRT };
-    for (unsigned int key = 0; key < nKeys; key++)
-    {
-        pinMode(pinAssignments[key], INPUT_PULLDOWN);
-        attachInterrupt(pinAssignments[key], ISR[key], RISING);
-    }
+    reset();
+    for (uint8_t i = 0; i < TotalInputs; i++)
+        pinAssignments[i] = Pins[i];
+        
+    begin(queue);
 }
 
-void InputHandler::buttonPress(unsigned int keyCode)
+void InputHandler::reset()
+{
+    for(uint8_t key = 0; key < nButtons; key++)
+      detachInterrupt(pinAssignments[key]);
+    
+    threads.kill(RightJoyStick.ThreadID);
+    threads.kill(LeftJoyStick.ThreadID); 
+}
+
+void InputHandler::buttonPress(uint8_t keyCode)
 {
     Event e;
     e.eventType = Event::Press;
@@ -33,13 +53,28 @@ void InputHandler::buttonPress(unsigned int keyCode)
     if (EQ != nullptr)
         EQ->putQ(e);
 }
-void InputHandler::buttonRelease(unsigned int keyCode)
+void InputHandler::buttonRelease(uint8_t keyCode)
 {
     Event e;
     e.eventType = Event::Release;
     e.code = keyCode;
     if (EQ != nullptr)
         EQ->putQ(e);
+}
+
+const JoyStick& InputHandler::RightAnalog(){ return RightJoyStick; }
+const JoyStick& InputHandler::LeftAnalog(){ return LeftJoyStick; }
+
+void InputHandler::TrackJoyStick(void* stick_Ptr)
+{
+    JoyStick* stick = (JoyStick*)stick_Ptr;
+    stick->ThreadID = threads.id();
+    
+    while (true)
+    {
+        stick->x = analogRead(pinAssignments[stick->codeX]);
+        stick->y = analogRead(pinAssignments[stick->codeY]);
+    }
 }
 
 void InputHandler::ISR_PressA() { attachInterrupt(pinAssignments[key_A], ISR_ReleaseA, FALLING); buttonPress(key_A); }
@@ -72,5 +107,8 @@ void InputHandler::ISR_ReleaseLT() { attachInterrupt(pinAssignments[LT], ISR_Pre
 void InputHandler::ISR_PressRT() { attachInterrupt(pinAssignments[RT], ISR_ReleaseRT, FALLING); buttonPress(RT); }
 void InputHandler::ISR_ReleaseRT() { attachInterrupt(pinAssignments[RT], ISR_PressRT, RISING); buttonRelease(RT); }
 
-unsigned int InputHandler::pinAssignments[] = { 0,1,2,3,4,5,6,7,8,9 };      //Default pin assignments
+uint8_t InputHandler::pinAssignments[] = { 0,1,2,3,4,5,6,7,8,9,14,15,16,17 };  //Default pin assignments
 EventQueue<Event>* InputHandler::EQ = nullptr;
+
+JoyStick InputHandler::LeftJoyStick = {0};
+JoyStick InputHandler::RightJoyStick = {0};
