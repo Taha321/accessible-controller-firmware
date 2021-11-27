@@ -1,34 +1,35 @@
 #ifndef _INPUTHANDLER_H
 #define _INPUTHANDLER_H
 
-
 #include <Arduino.h>
 #include <eventqueue.h>
-#include <TeensyThreads.h>
 
 #include "EventProcessor.h"
-
-
 
 class InputHandler
 {
   //keyCode enums and Event struct definition found in EventProcessor.h
 
   public:
-      InputHandler() = delete;
-      InputHandler(EventQueue<Event>& queue);                               //During initialization, a reference to an EventQueue to be used by the InputHandler is also provided
-                                                                            //The constructor also attaches ISR to their corresponding key Interrupts based on the default pin assignments
-
-      InputHandler(EventQueue<Event>& queue, unsigned int* PinAssignments); //In addition to functionality of the first constructor, custom pins are also assigned to keys
-                                                                            //PinAssignments is indexed by keyCodes
-
-      InputHandler(const InputHandler&) = delete;                           //Copy constructor and copy assignment can not be used
+      InputHandler() = delete;                                              //Static class, therefore can not be instantiated
+      InputHandler(const InputHandler&) = delete;                           
       InputHandler& operator=(const InputHandler&) = delete;
 
-      static void buttonPress(unsigned int keyCode);                        //Button Press event generated and added to queue for a given keyCode
-      static void buttonRelease(unsigned int keyCode);                      //Button Release event generated and added to queue for a given keyCode
+      static void begin(EventQueue<Event>& queue);                          //Reference to the target event queue stored in EQ, all ISR attached to default input pins
+      static void begin(EventQueue<Event>& queue, uint8_t* Pins);           //In addition to the first begin() function, an array of pin numbers is used to change pin assignments for inputs 
+      static void reset();
+      
+      static void buttonPress(uint8_t keyCode);                             //Button Press event generated and added to queue for a given keyCode
+      static void buttonRelease(uint8_t keyCode);                           //Button Release event generated and added to queue for a given keyCode
+
+      static const JoyStick& RightAnalog();                                 //Get read-only access to the Right analog Stick
+      static const JoyStick& LeftAnalog();                                  //Get read-only access to the Left analog Stick
 
   private:
+  
+      static void TrackJoyStick(void* stick_Ptr);                           //Track JoyStick values     
+
+
       //ISR for individual key interrupts created, using the buttonPress and buttonRelease methods
 
 
@@ -62,11 +63,17 @@ class InputHandler
       static void ISR_PressRT();                                            //ISR for event, Press RT
       static void ISR_ReleaseRT();                                          //ISR for event, Release RT
 
-  private:
-      static EventQueue<Event>* EQ;                                         //Pointer to an event queue 
-      static constexpr unsigned int nKeys = 10;                             //Number of keys implemented      
-      static unsigned int pinAssignments[nKeys];                            //Pin assignments, indexed by keyCodes, Default pin assignments found in InputHandler.cpp
+  private:      
+      static constexpr uint8_t TotalInputs = 14;
+      static constexpr uint8_t nButtons = 10;                               //Number of implemented inputs
+      static constexpr uint8_t nAnalog = 4;
+  
+      static JoyStick LeftJoyStick;                                         //Holds information about the current state of Left Joystick
+      static JoyStick RightJoyStick;                                        //Holds information about the current state of Right Joystick
+            
+      static EventQueue<Event>* EQ;                                         //Pointer to the targetted event queue    
+      static uint8_t pinAssignments[TotalInputs];                           //Pin assignments, indexed by keycode enums, default pin assignments found in InputHandler.cpp
 };
 
-
+extern InputHandler IH;                                                     //Global InputHandler class instance
 #endif
