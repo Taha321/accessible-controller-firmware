@@ -47,33 +47,24 @@ class EventProcessor
     Xinput presses.
     */
    public: 
-    void begin(EventQueue<Event>& queue) 
+    static void begin(EventQueue<Event>& queue) 
     {
         EQ = queue;
     }
-    
-    // Event getEvent()
-    // {
-    //   Event e = {0};
-    //   EQ->getQ(e)
-    //   return e;
-    // }    
-    void ProcessEvent_XInput()
+
+    static void ProcessEvent_XInput()
     {
-      Event e;
-      while(true)
-      {
+        Event e;
         if(EQ->getQ(e)) // Will return true if there is an event on the queue, false if it's empty
         {
-          uint8_t code = mapping[e.code]; // Fetch mapping from private variable
-          if e.type == Press 
+        uint8_t code = mapping[e.code]; // Fetch mapping from private variable
+        if e.type == Press 
             Xinput.press(code);
 
-          else if e.type == Release 
+        else if e.type == Release 
             Xinput.release(code);
-          
-        }
-      }
+
+        } 
     }
 
     
@@ -84,4 +75,5 @@ class EventProcessor
      
 
 };
+extern EventProcessor EP;
 #endif
