@@ -11,14 +11,12 @@ void setup()
   Serial.begin(9600);
   analogReadResolution(16);
   IH.begin(q, pins);
-  EP.begin(&q);
+  EP.begin(q);
+  Serial.print("Serial Mode");
 }
-
-int i=0;
 
 void loop() 
 {
   // Continuously pull off the Event Queue and process accordingly.
-  EP.ProcessEvent_XInput()
-  
+  EP.ProcessEvent_XInput();
 }

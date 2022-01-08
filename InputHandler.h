@@ -4,7 +4,45 @@
 #include <Arduino.h>
 #include <eventqueue.h>
 
-#include "EventProcessor.h"
+
+
+enum keycode : uint8_t // keyCode enums used to refer to different keys of a controller
+{
+    key_A = 0,
+    key_B = 1, 
+    key_X = 2, 
+    key_Y = 3,
+    Right = 4, 
+    Left = 5, 
+    Up = 6, 
+    Down = 7,
+    LT = 8, 
+    RT = 9, 
+    RightJoyStick_X = 10, 
+    RightJoyStick_Y = 11,
+    LeftJoyStick_X = 12, 
+    LeftJoyStick_Y = 13
+};
+struct Event // represents a button press/release 
+{
+    enum type
+    {
+        Press,
+        Release
+    };
+    type eventType;
+    uint8_t code;
+};
+
+struct JoyStick // Used to keep track of analogue inputs
+{
+    int ThreadID;
+    uint8_t codeX;
+    uint8_t codeY;
+    int16_t x;
+    int16_t y;
+};
+
 
 class InputHandler
 {
@@ -22,8 +60,8 @@ class InputHandler
       static void buttonPress(uint8_t keyCode);                             //Button Press event generated and added to queue for a given keyCode
       static void buttonRelease(uint8_t keyCode);                           //Button Release event generated and added to queue for a given keyCode
 
-      static const JoyStick& RightAnalog();                                 //Get read-only access to the Right analog Stick
-      static const JoyStick& LeftAnalog();                                  //Get read-only access to the Left analog Stick
+      static JoyStick& RightAnalog();                                       //Get read-only access to the Right analog Stick
+      static JoyStick& LeftAnalog();                                        //Get read-only access to the Left analog Stick
 
   private:
   
