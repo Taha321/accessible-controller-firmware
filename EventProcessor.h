@@ -1,42 +1,28 @@
 #ifndef _EVENTPROCESSOR_H
 #define _EVENTPROCESSOR_H
 
-enum keycode : uint8_t
-{
-    key_A = 0, 
-    key_B = 1, 
-    key_X = 2, 
-    key_Y = 3,
-    Right = 4, 
-    Left = 5, 
-    Up = 6, 
-    Down = 7,
-    LT = 8, 
-    RT = 9, 
-    RightJoyStick_X = 10, 
-    RightJoyStick_Y = 11,
-    LeftJoyStick_X = 12, 
-    LeftJoyStick_Y = 13
-};
-struct Event
-{
-    enum type
-    {
-        Press,
-        Release
-    };
-    type eventType;
-    uint8_t code;
-};
+#include "XInput.h"
+#include "InputHandler.h"
 
-struct JoyStick
+class EventProcessor
 {
-    int ThreadID;
-    uint8_t codeX;
-    uint8_t codeY;
-    uint16_t x;
-    uint16_t y;
+    /*
+    Take events off the queue and process them, transforming them into
+    Xinput presses.
+    */
+public:
+    EventProcessor() = delete;
+    EventProcessor(const EventProcessor&) = delete;
+    EventProcessor& operator= (const EventProcessor&) = delete;
+
+    static void begin(EventQueue<Event>& queue);
+    static void ProcessEvent_XInput();
+    
+private:
+    static EventQueue<Event>* EQ;
+
+    //used to map firmware keyCodes to XInput enums for keys
+    static const uint8_t keyCodeMap[14];
 };
-
-
+extern EventProcessor EP;
 #endif

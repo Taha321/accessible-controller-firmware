@@ -62,8 +62,8 @@ void InputHandler::buttonRelease(uint8_t keyCode)
         EQ->putQ(e);
 }
 
-const JoyStick& InputHandler::RightAnalog(){ return RightJoyStick; }
-const JoyStick& InputHandler::LeftAnalog(){ return LeftJoyStick; }
+JoyStick& InputHandler::RightAnalog(){ return RightJoyStick; }
+JoyStick& InputHandler::LeftAnalog(){ return LeftJoyStick; }
 
 void InputHandler::TrackJoyStick(void* stick_Ptr)
 {
@@ -72,8 +72,8 @@ void InputHandler::TrackJoyStick(void* stick_Ptr)
     
     while (true)
     {
-        stick->x = analogRead(pinAssignments[stick->codeX]);
-        stick->y = analogRead(pinAssignments[stick->codeY]);
+        stick->x = analogRead(pinAssignments[stick->codeX])-32768;
+        stick->y = analogRead(pinAssignments[stick->codeY])-32768;
     }
 }
 
