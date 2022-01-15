@@ -17,12 +17,23 @@ enum keycode : uint8_t // keyCode enums used to refer to different keys of a con
     Up = 6, 
     Down = 7,
     LT = 8, 
-    RT = 9, 
-    RightJoyStick_X = 10, 
-    RightJoyStick_Y = 11,
-    LeftJoyStick_X = 12, 
-    LeftJoyStick_Y = 13
+    RT = 9,
+    Record_Macro = 10,
+    Macro1 = 11,
+    RightJoyStick_X = 12, 
+    RightJoyStick_Y = 13,
+    LeftJoyStick_X = 14, 
+    LeftJoyStick_Y = 15
 };
+/*
+enum class EventType
+{
+  None = 0,
+  ButtonPressed,
+  ButtonReleased
+};
+*/
+
 struct Event // represents a button press/release 
 {
     enum type
@@ -32,6 +43,7 @@ struct Event // represents a button press/release
     };
     type eventType;
     uint8_t code;
+    bool Handled = false;
 };
 
 struct JoyStick // Used to keep track of analogue inputs
@@ -100,10 +112,16 @@ class InputHandler
                                                                                            
       static void ISR_PressRT();                                            //ISR for event, Press RT
       static void ISR_ReleaseRT();                                          //ISR for event, Release RT
+      
+      static void ISR_PressMacroRecording();
+      static void ISR_ReleaseMacroRecording();
+      
+      static void ISR_PressMACRO1();
+      static void ISR_ReleaseMACRO1();
 
   private:      
-      static constexpr uint8_t TotalInputs = 14;
-      static constexpr uint8_t nButtons = 10;                               //Number of implemented inputs
+      static constexpr uint8_t TotalInputs = 16;
+      static constexpr uint8_t nButtons = 13;                               //Number of implemented inputs
       static constexpr uint8_t nAnalog = 4;
   
       static JoyStick LeftJoyStick;                                         //Holds information about the current state of Left Joystick

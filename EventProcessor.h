@@ -17,6 +17,7 @@ public:
 
     static void begin(EventQueue<Event>& queue);
     static void ProcessEvent_XInput();
+    static void ProcessEvent_Switch();
     
 private:
     static EventQueue<Event>* EQ;

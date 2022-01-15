@@ -53,6 +53,7 @@ void InputHandler::buttonPress(uint8_t keyCode)
     if (EQ != nullptr)
         EQ->putQ(e);
 }
+
 void InputHandler::buttonRelease(uint8_t keyCode)
 {
     Event e;
@@ -75,6 +76,10 @@ void InputHandler::TrackJoyStick(void* stick_Ptr)
         stick->x = analogRead(pinAssignments[stick->codeX])-32768;
         stick->y = analogRead(pinAssignments[stick->codeY])-32768;
     }
+}
+
+void InputHandler::ISR_PressMacroRecording() {
+  buttonPress(keycode::Record_Macro);
 }
 
 void InputHandler::ISR_PressA() { attachInterrupt(pinAssignments[key_A], ISR_ReleaseA, FALLING); buttonPress(key_A); }
@@ -107,7 +112,13 @@ void InputHandler::ISR_ReleaseLT() { attachInterrupt(pinAssignments[LT], ISR_Pre
 void InputHandler::ISR_PressRT() { attachInterrupt(pinAssignments[RT], ISR_ReleaseRT, FALLING); buttonPress(RT); }
 void InputHandler::ISR_ReleaseRT() { attachInterrupt(pinAssignments[RT], ISR_PressRT, RISING); buttonRelease(RT); }
 
-uint8_t InputHandler::pinAssignments[] = { 0,1,2,3,4,5,6,7,8,9,14,15,16,17 };  //Default pin assignments
+static void ISR_PressMacroRecording() { attachInterrupt(pinAssignments[Record_Macro], ISR_PressMacroRecording, FALLING); buttonRelease(Record_Macro)}
+static void ISR_ReleaseMacroRecording() { attachInterrupt(pinAssignments[Record_Macro], ISR_ReleaseMacroRecording, RISING); buttonRelease(Record_Macro);}
+
+static void ISR_PressMACRO1() { attachInterrupt(pinAssignments[Macro1],ISR_ReleaseMACRO1, FALLING); buttonPress(Macro1) }
+static void ISR_ReleaseMACRO1() { attachInterrupt(pinAssignments[Macro1],ISR_ReleaseMACRO1, RISING); buttonPress(Macro1) };
+
+uint8_t InputHandler::pinAssignments[] = { 0,1,2,3,4,5,6,7,8,9,10,11,14,15,16,17 };  //Default pin assignments
 EventQueue<Event>* InputHandler::EQ = nullptr;
 
 JoyStick InputHandler::LeftJoyStick = {0};
