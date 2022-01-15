@@ -4,5 +4,5 @@
 class Subscriber
 {
     public:
-        virtual bool OnEvent(Event e) = 0;
+        virtual void OnEvent(Event e) = 0;
 };

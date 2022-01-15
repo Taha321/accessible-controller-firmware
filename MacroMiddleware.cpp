@@ -1,13 +1,13 @@
-#include "MacroProcessor.h"
+#include "MacroMiddleware.h"
 #include "assert.h"
 
-MacroProcessor::MacroProcessor() 
+MacroMiddleware::MacroMiddleware() 
 {
   m_EventQueue = new QueueArray<Event>();
   //TO DO: load macros from storage
 };
 
-MacroProcessor::~MacroProcessor()
+MacroMiddleware::~MacroMiddleware()
 {
   QueueArray<Event>& queue = *(m_EventQueue);
   while (!queue.isEmpty())
@@ -16,29 +16,31 @@ MacroProcessor::~MacroProcessor()
 }
 
 
-bool MacroProcessor::OnEvent(Event e) 
+void MacroMiddleware::OnEvent(Event e) 
 {
   switch(m_State)
   {
     case State::RECORDING:
       recordEvent(e);
-      return true;
+      break;
       
     case State::IDLE:
       if(e.code == keycode::Macro1) 
       {
         executeMacro(1);
-        return true;
+        break;
       }
-      if(e.code == keycode::Record_Macro);
+      if(e.code == keycode::Record_Macro) 
+      {
         startRecording();
-        return true;
+        break;
+      }
      default:
-       return false;
+        publish(e);
   }  
 }
 
-void MacroProcessor::recordEvent(Event e)
+void MacroMiddleware::recordEvent(Event e)
 {
   if(e.code == keycode::Macro1) return;
   if(e.code == keycode::Record_Macro) 
@@ -48,7 +50,7 @@ void MacroProcessor::recordEvent(Event e)
   }
 }
 
-void MacroProcessor::startRecording()
+void MacroMiddleware::startRecording()
 {
   QueueArray<Event>& queue = *(m_EventQueue);
   while(!queue.isEmpty())
@@ -57,7 +59,7 @@ void MacroProcessor::startRecording()
 }
 
 
-void MacroProcessor::executeMacro(int macro)
+void MacroMiddleware::executeMacro(int macro)
 {
   QueueArray<Event>& queue = *(m_EventQueue);
   int size = queue.count();   

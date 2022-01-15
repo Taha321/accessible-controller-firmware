@@ -6,7 +6,7 @@ EventProcessor::EventProcessor()
   m_Queue = new EventQueue<Event>();
 }
 
-bool EventProcessor::OnEvent(Event e) {
+void EventProcessor::OnEvent(Event e) {
     m_Queue->putQ(e);
 }
 

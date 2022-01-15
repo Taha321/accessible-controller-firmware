@@ -16,7 +16,7 @@ class EventProcessor : public Subscriber
 public:
     EventProcessor();
     inline EventQueue<Event>& GetQueue() {return *m_Queue;}
-    bool OnEvent(Event e) override;
+    void OnEvent(Event e) override;
     void ProcessEvent();
 private:
     EventQueue<Event>* m_Queue;

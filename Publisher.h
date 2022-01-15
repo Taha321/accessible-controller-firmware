@@ -10,10 +10,8 @@ class Publisher
     }
 
     void publish(Event e) {
-        bool handled = false;
         for(int i = 0; i < m_SubCount; i ++) {
-            handled = m_Subscribers[m_SubCount]->OnEvent(e);
-            if (handled) break;
+            m_Subscribers[m_SubCount]->OnEvent(e);
         }
     }
     private:
