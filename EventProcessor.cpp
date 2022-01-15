@@ -1,19 +1,25 @@
 #include "EventProcessor.h"
+#include "InputHandler.h"
+#include "assert.h"
+EventProcessor* EventProcessor::s_Instance = nullptr;
 
-
-void EventProcessor::begin(EventQueue<Event>& queue)
+EventProcessor::EventProcessor()
 {
-  EQ = &queue;
+  assert(!s_Instance);
+  s_Instance = this;
+  m_Queue = new EventQueue<Event>();
 }
 
 void EventProcessor::ProcessEvent_XInput() 
 {
     Event e;
-    if (EQ->getQ(e)) // Will return true if there is an event on the queue, false if it's empty
+    if (s_Instance->m_Queue->getQ(e)) // Will return true if there is an event on the queue, false if it's empty
     {
         uint8_t code = keyCodeMap[e.code]; // Fetch mapping from private variable
         
-        bool handled = MP.onEvent(e);
+        bool handled = false;
+        if (s_Instance->m_SubscriberCallbackFn)
+          handled = s_Instance->m_SubscriberCallbackFn(e);
         
         if(!handled) 
         {
@@ -24,10 +30,8 @@ void EventProcessor::ProcessEvent_XInput()
             XInput.release(code); 
         }
     }
-    XInput.setJoystick(JOY_RIGHT, IH.RightAnalog().x, IH.RightAnalog().y);
-    XInput.setJoystick(JOY_LEFT, IH.LeftAnalog().x, IH.LeftAnalog().y);
+    XInput.setJoystick(JOY_RIGHT, InputHandler::GetRightAnalog().x, InputHandler::GetRightAnalog().y);
+    XInput.setJoystick(JOY_LEFT, InputHandler::GetLeftAnalog().x, InputHandler::GetLeftAnalog().y);
 }
-
-EventQueue<Event>* EventProcessor::EQ = nullptr;
 const uint8_t EventProcessor::keyCodeMap[] = { BUTTON_A, BUTTON_B, BUTTON_X, BUTTON_Y, DPAD_RIGHT, DPAD_LEFT, DPAD_UP, DPAD_DOWN,
                                                 TRIGGER_LEFT, TRIGGER_RIGHT, JOY_LEFT, JOY_LEFT, JOY_RIGHT, JOY_RIGHT }; 

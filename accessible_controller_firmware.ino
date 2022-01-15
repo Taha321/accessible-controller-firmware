@@ -1,22 +1,32 @@
 #include "InputHandler.h"
 #include "XInput.h"
 #include "EventProcessor.h"
+#include "MacroProcessor.h"
 
-EventQueue<Event> q; 
-uint8_t pins[] = {9,8,7,6,5,4,3,2,1,0,17,16,15,14};
+EventProcessor eventProcessor;
+MacroProcessor macroProcessor;
+
+void onEvent(Event e) {
+  eventProcessor.GetQueue().putQ(e);
+}
+
+bool subscribe(Event e) {
+  bool handled = macroProcessor.OnEvent(e);
+  return handled;
+}
 
 void setup()
 {
   pinMode(13,OUTPUT);
   Serial.begin(9600);
   analogReadResolution(16);
-  IH.begin(q, pins);
-  EP.begin(q);
+  InputHandler::setEventCallbackFn(onEvent);
+  eventProcessor.SetSubscriberCallbackFn(subscribe);
   Serial.print("Serial Mode");
 }
 
 void loop() 
 {
   // Continuously pull off the Event Queue and process accordingly.
-  EP.ProcessEvent_XInput();
+  eventProcessor.ProcessEvent_XInput();
 }

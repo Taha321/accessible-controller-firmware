@@ -1,42 +1,53 @@
 #include "MacroProcessor.h"
+#include "assert.h"
+MacroProcessor* MacroProcessor::s_Instance = nullptr;
 
-void MacroProcessor::Begin(EventQueue<Event>& queue) 
+MacroProcessor::MacroProcessor() 
 {
-  EQ = queue;
-  s_eventQueue = new QueueArray<Event>();
-  //load in data;
+  assert(!s_Instance);
+  s_Instance = this;
+  m_EventQueue = new QueueArray<Event>();
+  //TO DO: load macros from storage
 };
 
-void MacroProcessor::reset()
+MacroProcessor::~MacroProcessor()
 {
-  while (!s_eventQueue.isEmpty())
-    s_Instance.eventQueue.dequeue();
+  QueueArray<Event>& queue = *(s_Instance->m_EventQueue);
+  while (!queue.isEmpty())
+    queue.dequeue();
+  delete s_Instance->m_EventQueue;
 }
 
 
 bool MacroProcessor::OnEvent(Event e) 
 {
+  bool isRecording = s_Instance->m_IsRecording;
+  bool isExecuting = s_Instance->m_IsExecuting;
+  
   // Handle macro record button press
-  if(e.keyCode == keycode::Record_Macro)
-  {
-    toggleRecording();
-    return true;
+  if(!isExecuting) {
+    if(e.code == keycode::Record_Macro)
+    {
+      s_Instance->toggleRecording();
+      return true;
+    }
+   return false;
   }
 
   // Handle macro execute press
-  if(!s_isRecording)
+  if(!isRecording && !isExecuting)
   {
-    if(e.keyCode == keycode::Macro1) 
+    if(e.code == keycode::Macro1) 
     {
-      executeMacro(1);
+      s_Instance->executeMacro(1);
       return true;
     }  
   }
   
   // Handle Everything else
-  if(s_isRecording) 
+  if(isRecording && !isExecuting) 
   {
-    s_eventQueue.enqueue(e);
+    s_Instance->m_EventQueue->enqueue(e);
     return true;
   }
 
@@ -45,27 +56,28 @@ bool MacroProcessor::OnEvent(Event e)
 
 void MacroProcessor::toggleRecording() 
 {
-  if(!s_isRecording) 
+  bool isRecording = s_Instance->m_IsRecording;
+  QueueArray<Event>& queue = *(s_Instance->m_EventQueue);
+  if(!isRecording) 
   {
-    while(!s_eventQueue.isEmpty())
-      s_eventQueue.dequeue();
+    while(!queue.isEmpty())
+      queue.dequeue();
 
-    s_isRecording = true;
+    s_Instance->m_IsRecording = true;
   }
   else 
-    s_isRecording = false;
+    s_Instance->m_IsRecording = false;
 }
 
 void MacroProcessor::executeMacro(int macro)
 {
+  QueueArray<Event>& queue = *(s_Instance->m_EventQueue);
   // Takes macro number (i.e 1, 2, ...)
-  int size = s_eventQueue.size();   
+  int size = queue.count();   
   for(int i = 0; i < size; i++) 
   {
-    Event e = s_eventQueue.dequeue();
-    EQ->enqueue(e);
-    s_eventQueue.enqueue(e);
+    Event e = queue.dequeue();
+    EventProcessor::Get().GetQueue().putQ(e);
+    queue.enqueue(e);
   }
 }
-
-
