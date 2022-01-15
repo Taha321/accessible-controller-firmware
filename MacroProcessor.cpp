@@ -21,53 +21,47 @@ MacroProcessor::~MacroProcessor()
 
 bool MacroProcessor::OnEvent(Event e) 
 {
-  bool isRecording = s_Instance->m_IsRecording;
-  bool isExecuting = s_Instance->m_IsExecuting;
-  
-  // Handle macro record button press
-  if(!isExecuting) {
-    if(e.code == keycode::Record_Macro)
-    {
-      s_Instance->toggleRecording();
-      return true;
-    }
-   return false;
-  }
-
-  // Handle macro execute press
-  if(!isRecording && !isExecuting)
+  switch(s_Instance->m_State)
   {
-    if(e.code == keycode::Macro1) 
-    {
-      s_Instance->executeMacro(1);
+    case State::RECORDING:
+      s_Instance->recordEvent(e);
       return true;
-    }  
-  }
-  
-  // Handle Everything else
-  if(isRecording && !isExecuting) 
-  {
-    s_Instance->m_EventQueue->enqueue(e);
-    return true;
-  }
-
-  return false;
+      
+    case State::EXECUTING:
+      return false;
+      
+    case State::IDLE:
+      if(e.code == keycode::Macro1) 
+      {
+        s_Instance->executeMacro(1);
+        return true;
+      }
+      if(e.code == keycode::Record_Macro);
+        s_Instance->startRecording();
+        return true;
+     default:
+       return false;
+  }  
 }
 
-void MacroProcessor::toggleRecording() 
+void MacroProcessor::recordEvent(Event e)
 {
-  bool isRecording = s_Instance->m_IsRecording;
-  QueueArray<Event>& queue = *(s_Instance->m_EventQueue);
-  if(!isRecording) 
-  {
-    while(!queue.isEmpty())
-      queue.dequeue();
-
-    s_Instance->m_IsRecording = true;
+  if(e.code == keycode::Macro1) return;
+  if(e.code == keycode::Record_Macro) 
+    s_Instance->m_State = State::IDLE;
+  else {
+    s_Instance->m_EventQueue->enqueue(e);
   }
-  else 
-    s_Instance->m_IsRecording = false;
 }
+
+void MacroProcessor::startRecording()
+{
+  QueueArray<Event>& queue = *(s_Instance->m_EventQueue);
+  while(!queue.isEmpty())
+    queue.dequeue();
+  s_Instance->m_State = State::RECORDING;
+}
+
 
 void MacroProcessor::executeMacro(int macro)
 {
@@ -80,4 +74,5 @@ void MacroProcessor::executeMacro(int macro)
     EventProcessor::Get().GetQueue().putQ(e);
     queue.enqueue(e);
   }
+  s_Instance->m_State = State::IDLE;
 }

@@ -11,7 +11,7 @@ void onEvent(Event e) {
 }
 
 bool subscribe(Event e) {
-  bool handled = macroProcessor.OnEvent(e);
+  bool handled = MacroProcessor::OnEvent(e);
   return handled;
 }
 

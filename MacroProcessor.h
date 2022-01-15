@@ -8,18 +8,27 @@
 
 class MacroProcessor 
 {
+  
   public:
     MacroProcessor();
     virtual ~MacroProcessor();
     static void reset();    
     static bool OnEvent(Event e);
     void executeMacro(int macro);
-    void toggleRecording();
+    void recordEvent(Event e);
+    void startRecording();
 
-  private:  
+  private:
+    enum State
+    {
+      IDLE = 0,
+      RECORDING,
+      EXECUTING
+    };  
     QueueArray<Event>* m_EventQueue;
     bool m_IsRecording = false;
     bool m_IsExecuting = false;
+    State m_State = IDLE;
   private:
     static MacroProcessor* s_Instance;
 };
