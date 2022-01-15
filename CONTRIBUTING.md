@@ -115,7 +115,8 @@ project:
    git checkout -b <topic-branch-name>
    ```
 
-   A topic branch name should adhere to the following format; `<feat|bugfix|experiment>/<topic-name>`
+   A topic branch name should adhere to the following format; `<feat|bugfix|experiment>/<topic-name>`. For example, a topic branch may look like this;
+   `bugfix/eventqueue-memory-corruption`.
 
 4. Commit your changes in logical chunks. Please adhere to these [git commit
    message guidelines](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)
