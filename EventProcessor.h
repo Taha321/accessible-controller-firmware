@@ -1,12 +1,12 @@
 #ifndef _EVENTPROCESSOR_H
 #define _EVENTPROCESSOR_H
 
-#include "XInput.h"
 #include "Event.h"
 #include "KeyCode.h"
 #include "Subscriber.h"
+#include "PlatformAPI.h"
 #include <eventqueue.h>
-
+#include <stdint.h>
 class EventProcessor : public Subscriber
 {
     /*
@@ -15,14 +15,14 @@ class EventProcessor : public Subscriber
     */
 public:
     EventProcessor();
+    virtual ~EventProcessor();
     inline EventQueue<Event>& GetQueue() {return *m_Queue;}
     void OnEvent(Event e) override;
-    void ProcessEvent();
+    void OnUpdate();
 private:
     EventQueue<Event>* m_Queue;
+    PlatformAPI* m_PlatformAPI;
     //used to map firmware keyCodes to XInput enums for keys
-private:
-    static const uint8_t keyCodeMap[14];
 
 };
 #endif

@@ -19,5 +19,5 @@ void setup()
 void loop() 
 {
   // Continuously pull off the Event Queue and process accordingly.
-  eventProcessor.ProcessEvent();
+  eventProcessor.OnUpdate();
 }

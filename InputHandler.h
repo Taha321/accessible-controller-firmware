@@ -7,6 +7,12 @@
 #include "KeyCode.h"
 #include "Publisher.h"
 
+enum class JoyStickType {
+    None = 0,
+    Left,
+    Right
+};
+
 struct JoyStick // Used to keep track of analogue inputs
 {
     int ThreadID;

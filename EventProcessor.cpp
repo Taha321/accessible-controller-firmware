@@ -1,30 +1,47 @@
 #include "EventProcessor.h"
 #include "InputHandler.h"
+#include "XInputAPI.h"
+#include "assert.h"
+
+static PlatformAPI* InitPlatformAPI()
+{
+  switch(PlatformAPI::Current())
+  {
+      case PlatformAPIType::XInput: return new XInputAPI(); 
+      case PlatformAPIType::None:
+        PlatformAPI::SetAPI(PlatformAPIType::XInput);
+        return new XInputAPI();
+      default:
+        assert(false);
+  }
+}
 
 EventProcessor::EventProcessor()
 {
   m_Queue = new EventQueue<Event>();
+  m_PlatformAPI = InitPlatformAPI();
+}
+
+EventProcessor::~EventProcessor() {
+
 }
 
 void EventProcessor::OnEvent(Event e) {
     m_Queue->putQ(e);
 }
 
-void EventProcessor::ProcessEvent() 
+void EventProcessor::OnUpdate() 
 {
     Event e;
     if (m_Queue->getQ(e)) // Will return true if there is an event on the queue, false if it's empty
     {
-        uint8_t code = keyCodeMap[e.code]; // Fetch mapping from private variable
         if(e.eventType == Event::Press)
-            XInput.press(code);
+            m_PlatformAPI->Press(e.code);
 
         else if(e.eventType == Event::Release)
-            XInput.release(code); 
+            m_PlatformAPI->Release(e.code); 
         
     }
-    XInput.setJoystick(JOY_RIGHT, InputHandler::GetRightAnalog().x, InputHandler::GetRightAnalog().y);
-    XInput.setJoystick(JOY_LEFT, InputHandler::GetLeftAnalog().x, InputHandler::GetLeftAnalog().y);
+    m_PlatformAPI->SetJoyStick(JoyStickType::Right, InputHandler::GetRightAnalog().x, InputHandler::GetRightAnalog().y);
+    m_PlatformAPI->SetJoyStick(JoyStickType::Left, InputHandler::GetLeftAnalog().x, InputHandler::GetLeftAnalog().y);
 }
-const uint8_t EventProcessor::keyCodeMap[] = { BUTTON_A, BUTTON_B, BUTTON_X, BUTTON_Y, DPAD_RIGHT, DPAD_LEFT, DPAD_UP, DPAD_DOWN,
-                                                TRIGGER_LEFT, TRIGGER_RIGHT, JOY_LEFT, JOY_LEFT, JOY_RIGHT, JOY_RIGHT }; 

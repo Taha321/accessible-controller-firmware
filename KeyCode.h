@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 enum keycode : uint8_t // keyCode enums used to refer to different keys of a controller
 {
