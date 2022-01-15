@@ -5,7 +5,7 @@ struct Event // represents a button press/release
     enum type
     {
         Press,
-        Release
+        Release,
     };
     type eventType;
     uint8_t code;

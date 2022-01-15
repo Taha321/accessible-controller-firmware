@@ -5,6 +5,7 @@
 #include <eventqueue.h>
 #include "Event.h"
 #include "KeyCode.h"
+#include "Publisher.h"
 
 struct JoyStick // Used to keep track of analogue inputs
 {
@@ -16,7 +17,7 @@ struct JoyStick // Used to keep track of analogue inputs
 };
 
 using OnEventCallbackFn = void (*)(Event);
-class InputHandler
+class InputHandler : public Publisher
 {
   //keyCode enums and Event struct definition found in EventProcessor.h
 
@@ -28,7 +29,8 @@ class InputHandler
       static void buttonRelease(uint8_t keyCode);                           //Button Release event generated and added to queue for a given keyCode
       static inline void setEventCallbackFn(OnEventCallbackFn callback) {s_Instance->m_EventCallback = callback;}
       static inline const JoyStick& GetRightAnalog() {return s_Instance->m_RightJoyStick;}                                      
-      static inline const JoyStick& GetLeftAnalog() {return s_Instance->m_LeftJoyStick;}                                        
+      static inline const JoyStick& GetLeftAnalog() {return s_Instance->m_LeftJoyStick;}     
+      static inline void AddSubscriber(Subscriber& subscriber) {s_Instance->AddSubscriber(subscriber);}                                   
   private:
       static void TrackJoyStick(void* stick_Ptr); 
       static constexpr uint8_t s_TotalInputs = 16;

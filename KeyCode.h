@@ -17,5 +17,5 @@ enum keycode : uint8_t // keyCode enums used to refer to different keys of a con
     RightJoyStick_X = 12, 
     RightJoyStick_Y = 13,
     LeftJoyStick_X = 14, 
-    LeftJoyStick_Y = 15
+    LeftJoyStick_Y = 15,
 };

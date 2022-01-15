@@ -48,8 +48,7 @@ void InputHandler::buttonPress(uint8_t keyCode)
     Event e;
     e.eventType = Event::Press;
     e.code = keyCode;
-    if(s_Instance->m_EventCallback)
-      s_Instance->m_EventCallback(e);
+    s_Instance->publish(e);
 }
 
 void InputHandler::buttonRelease(uint8_t keyCode)
@@ -57,8 +56,7 @@ void InputHandler::buttonRelease(uint8_t keyCode)
     Event e;
     e.eventType = Event::Release;
     e.code = keyCode;
-    if(s_Instance->m_EventCallback)
-      s_Instance->m_EventCallback(e);
+    s_Instance->publish(e);
 }
 
 void InputHandler::TrackJoyStick(void* stick_Ptr)
@@ -77,7 +75,7 @@ void InputHandler::ISR_PressMacroRecording() {
   buttonPress(keycode::Record_Macro);
 }
 
-static void InputHandler::ISR_PressMacro1() { buttonPress(Macro1); }
+void InputHandler::ISR_PressMacro1() { buttonPress(Macro1); }
 
 void InputHandler::ISR_PressA() { attachInterrupt(s_Instance->m_PinAssignments[key_A], ISR_ReleaseA, FALLING); buttonPress(key_A); }
 void InputHandler::ISR_ReleaseA() { attachInterrupt(s_Instance->m_PinAssignments[key_A], ISR_PressA, RISING); buttonRelease(key_A); }
