@@ -1,12 +1,15 @@
 #include "InputHandler.h"
 #include <TeensyThreads.h>
 #include "assert.h"
+
+
 InputHandler* InputHandler::s_Instance = new InputHandler();
 
 InputHandler::InputHandler()
 {   
+    Serial.begin(9600);
     assert(!s_Instance);
-    int pins[] = {9,8,7,6,5,4,3,2,1,0,17,16,15,14,99,99};
+    int pins[] = {11,10,9,8,7,6,5,4,3,2,1,0,17,16,15,14};
     s_Instance = this;
     
     for (uint8_t i = 0; i < s_TotalInputs; i++) 
@@ -48,7 +51,8 @@ void InputHandler::buttonPress(uint8_t keyCode)
     Event e;
     e.eventType = Event::Press;
     e.code = keyCode;
-    s_Instance->publish(e);
+    e.Handled = false;
+    s_EventQueue.putQ(e);
 }
 
 void InputHandler::buttonRelease(uint8_t keyCode)
@@ -56,7 +60,8 @@ void InputHandler::buttonRelease(uint8_t keyCode)
     Event e;
     e.eventType = Event::Release;
     e.code = keyCode;
-    s_Instance->publish(e);
+    e.Handled = false;
+    s_EventQueue.putQ(e);
 }
 
 void InputHandler::TrackJoyStick(void* stick_Ptr)
@@ -71,9 +76,7 @@ void InputHandler::TrackJoyStick(void* stick_Ptr)
     }
 }
 
-void InputHandler::ISR_PressMacroRecording() {
-  buttonPress(keycode::Record_Macro);
-}
+void InputHandler::ISR_PressMacroRecording() { buttonPress(keycode::Record_Macro); }
 
 void InputHandler::ISR_PressMacro1() { buttonPress(Macro1); }
 
@@ -106,3 +109,5 @@ void InputHandler::ISR_ReleaseLT() { attachInterrupt(s_Instance->m_PinAssignment
             
 void InputHandler::ISR_PressRT() { attachInterrupt(s_Instance->m_PinAssignments[RT], ISR_ReleaseRT, FALLING); buttonPress(RT); }
 void InputHandler::ISR_ReleaseRT() { attachInterrupt(s_Instance->m_PinAssignments[RT], ISR_PressRT, RISING); buttonRelease(RT); }
+
+EventQueue<Event> InputHandler::s_EventQueue = EventQueue<Event>();

@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+
 struct Event // represents a button press/release 
 {
     enum type

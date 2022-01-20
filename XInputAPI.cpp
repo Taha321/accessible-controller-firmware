@@ -1,21 +1,25 @@
 #include "XInputAPI.h"
 #include "assert.h"
 
-uint8_t XInputAPI::nativeToXInput(uint8_t code) {
+uint8_t XInputAPI::nativeToXInput(uint8_t code) 
+{
     return keyCodeMap[code];
 }
 
-void XInputAPI::Press(uint8_t code) {
+void XInputAPI::Press(uint8_t code) 
+{
     uint8_t XInputKeyCode = nativeToXInput(code);
     XInput.press(XInputKeyCode);
 }
 
-void XInputAPI::Release(uint8_t code) {
+void XInputAPI::Release(uint8_t code)
+{
     uint8_t XInputKeyCode = nativeToXInput(code);
     XInput.release(XInputKeyCode);
 }
 
-void XInputAPI::SetJoyStick(JoyStickType type, int16_t x, int16_t y) {
+void XInputAPI::SetJoyStick(JoyStickType type, int16_t x, int16_t y)
+{
     switch(type){
         case JoyStickType::Left:
             XInput.setJoystick(JOY_LEFT,x,y);

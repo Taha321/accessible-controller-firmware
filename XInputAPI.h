@@ -10,6 +10,7 @@ class XInputAPI : public PlatformAPI
         void Press(uint8_t code) override;
         void Release(uint8_t code) override;
         void SetJoyStick(JoyStickType type, int16_t x, int16_t y) override;
+        
     private:
         static uint8_t nativeToXInput(uint8_t code);
         static const uint8_t keyCodeMap[14];
