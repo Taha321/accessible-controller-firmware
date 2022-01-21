@@ -80,8 +80,7 @@ void MacroProcessor::executeMacro(uint8_t macro)
   for(uint8_t i = 0; i < size; i++) 
   {
     Event e = m_EventQueue->dequeue();
-    Event event = e;                                 //A new copy must be created to pass to the event queue by reference
-    InputHandler::GetEventQueue().putQ(event);
+    InputHandler::GetEventQueue().putQ(e);
     m_EventQueue->enqueue(e);
   }
 }

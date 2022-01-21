@@ -7,7 +7,6 @@ InputHandler* InputHandler::s_Instance = new InputHandler();
 
 InputHandler::InputHandler()
 {   
-    Serial.begin(9600);
     assert(!s_Instance);
     int pins[] = {11,10,9,8,7,6,5,4,3,2,1,0,17,16,15,14};
     s_Instance = this;
