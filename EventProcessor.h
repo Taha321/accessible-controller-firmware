@@ -1,7 +1,7 @@
 #ifndef _EVENTPROCESSOR_H
 #define _EVENTPROCESSOR_H
 
-
+#include "QueueArray.h"
 #include "MacroProcessor.h"
 #include "PlatformAPI.h"
 

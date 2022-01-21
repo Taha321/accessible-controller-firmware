@@ -1,7 +1,6 @@
 #ifndef _MACROPROCESSOR_H
 #define _MACROPROCESSOR_H
 
-#include "QueueArray.h"
 #include "Event.h"
 #include "KeyCode.h"
 
