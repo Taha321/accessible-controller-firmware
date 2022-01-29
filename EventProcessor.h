@@ -1,8 +1,10 @@
 #ifndef _EVENTPROCESSOR_H
 #define _EVENTPROCESSOR_H
 
-#include "XInput.h"
-#include "InputHandler.h"
+#include "QueueArray.h"
+#include "MacroProcessor.h"
+#include "PlatformAPI.h"
+
 
 class EventProcessor
 {
@@ -11,18 +13,14 @@ class EventProcessor
     Xinput presses.
     */
 public:
-    EventProcessor() = delete;
-    EventProcessor(const EventProcessor&) = delete;
-    EventProcessor& operator= (const EventProcessor&) = delete;
-
-    static void begin(EventQueue<Event>& queue);
-    static void ProcessEvent_XInput();
+    EventProcessor();
+    virtual ~EventProcessor();
+    
+    void OnUpdate();
     
 private:
-    static EventQueue<Event>* EQ;
-
+    MacroProcessor m_MacroProcessor;
+    PlatformAPI* m_PlatformAPI;
     //used to map firmware keyCodes to XInput enums for keys
-    static const uint8_t keyCodeMap[14];
 };
-extern EventProcessor EP;
 #endif

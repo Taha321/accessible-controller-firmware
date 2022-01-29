@@ -1,27 +1,53 @@
 #include "EventProcessor.h"
+#include "InputHandler.h"
+#include "XInputAPI.h"
+
+#include "assert.h"
 
 
-void EventProcessor::begin(EventQueue<Event>& queue)
+static PlatformAPI* InitPlatformAPI()
 {
-  EQ = &queue;
+  switch(PlatformAPI::Current())
+  {
+      case PlatformAPIType::XInput:
+        return new XInputAPI(); 
+        
+      case PlatformAPIType::None:
+        PlatformAPI::SetAPI(PlatformAPIType::XInput);
+        return new XInputAPI(); 
+      
+      default:
+        assert(false);
+  }
 }
 
-void EventProcessor::ProcessEvent_XInput() 
+
+EventProcessor::EventProcessor()
+  :
+  m_MacroProcessor(MacroProcessor())
 {
-    Event e;
-    if (EQ->getQ(e)) // Will return true if there is an event on the queue, false if it's empty
+  m_PlatformAPI = InitPlatformAPI();
+}
+
+EventProcessor::~EventProcessor()
+{
+
+}
+
+void EventProcessor::OnUpdate() 
+{
+     
+    if (!InputHandler::GetEventQueue().isEmpty()) // Will return true if there is an event on the queue, false if it's empty
     {
-        uint8_t code = keyCodeMap[e.code]; // Fetch mapping from private variable
-        if(e.eventType == Event::Press)
-            XInput.press(code);
-
-        else if(e.eventType == Event::Release)
-            XInput.release(code);
+      Event e = InputHandler::GetEventQueue().dequeue();
+      delay(e.wait); // member wait is 0 by default and some value if it is an event from a recorded macro
+      m_MacroProcessor.DispatchEvent(e);
+      m_PlatformAPI->DispatchEvent(e);
+      if(e.Handled == false)          //Debugging
+        Serial.println("EVENT NOT HANDLED");
+  
     }
-    XInput.setJoystick(JOY_RIGHT, IH.RightAnalog().x, IH.RightAnalog().y);
-    XInput.setJoystick(JOY_LEFT, IH.LeftAnalog().x, IH.LeftAnalog().y);
+    m_PlatformAPI->SetJoyStick(JoyStickType::Right, InputHandler::GetRightAnalog().x, InputHandler::GetRightAnalog().y);
+    m_PlatformAPI->SetJoyStick(JoyStickType::Left, InputHandler::GetLeftAnalog().x, InputHandler::GetLeftAnalog().y);
+   
 }
-
-EventQueue<Event>* EventProcessor::EQ = nullptr;
-const uint8_t EventProcessor::keyCodeMap[] = { BUTTON_A, BUTTON_B, BUTTON_X, BUTTON_Y, DPAD_RIGHT, DPAD_LEFT, DPAD_UP, DPAD_DOWN,
-                                              TRIGGER_LEFT, TRIGGER_RIGHT, JOY_LEFT, JOY_LEFT, JOY_RIGHT, JOY_RIGHT }; 
