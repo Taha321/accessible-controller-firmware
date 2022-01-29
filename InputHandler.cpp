@@ -51,7 +51,7 @@ void InputHandler::buttonPress(uint8_t keyCode)
     e.eventType = Event::Press;
     e.code = keyCode;
     e.Handled = false;
-    s_EventQueue.putQ(e);
+    s_EventQueue.enqueue(e);
 }
 
 void InputHandler::buttonRelease(uint8_t keyCode)
@@ -60,7 +60,7 @@ void InputHandler::buttonRelease(uint8_t keyCode)
     e.eventType = Event::Release;
     e.code = keyCode;
     e.Handled = false;
-    s_EventQueue.putQ(e);
+    s_EventQueue.enqueue(e);
 }
 
 void InputHandler::TrackJoyStick(void* stick_Ptr)
@@ -109,4 +109,4 @@ void InputHandler::ISR_ReleaseLT() { attachInterrupt(s_Instance->m_PinAssignment
 void InputHandler::ISR_PressRT() { attachInterrupt(s_Instance->m_PinAssignments[RT], ISR_ReleaseRT, FALLING); buttonPress(RT); }
 void InputHandler::ISR_ReleaseRT() { attachInterrupt(s_Instance->m_PinAssignments[RT], ISR_PressRT, RISING); buttonRelease(RT); }
 
-EventQueue<Event> InputHandler::s_EventQueue = EventQueue<Event>();
+QueueArray<Event> InputHandler::s_EventQueue = QueueArray<Event>();

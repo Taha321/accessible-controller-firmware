@@ -2,10 +2,9 @@
 #define _INPUTHANDLER_H
 
 #include <Arduino.h>
-#include <eventqueue.h>
 #include "Event.h"
 #include "KeyCode.h"
-
+#include "QueueArray.h"
 enum class JoyStickType {
     None = 0,
     Left,
@@ -37,7 +36,8 @@ class InputHandler
       static inline const JoyStick& GetRightAnalog() { return s_Instance->m_RightJoyStick; }                                      
       static inline const JoyStick& GetLeftAnalog() { return s_Instance->m_LeftJoyStick; }
 
-      static inline EventQueue<Event>& GetEventQueue(){ return s_EventQueue; }
+      static inline QueueArray<Event>& GetEventQueue(){ return s_EventQueue; }
+      
             
   private:
       static void TrackJoyStick(void* stick_Ptr); 
@@ -83,7 +83,7 @@ class InputHandler
       static constexpr uint8_t s_NumButtons = 12;                           //Number of implemented inputs
       static constexpr uint8_t s_NumAnalog = 4;
 
-      static EventQueue<Event> s_EventQueue;
+      static QueueArray<Event> s_EventQueue;
       static InputHandler* s_Instance;
       
   private:

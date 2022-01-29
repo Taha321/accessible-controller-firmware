@@ -36,9 +36,10 @@ EventProcessor::~EventProcessor()
 
 void EventProcessor::OnUpdate() 
 {
-    Event e;
-    if (InputHandler::GetEventQueue().getQ(e)) // Will return true if there is an event on the queue, false if it's empty
+     
+    if (!InputHandler::GetEventQueue().isEmpty()) // Will return true if there is an event on the queue, false if it's empty
     {
+      Event e = InputHandler::GetEventQueue().dequeue();
       delay(e.wait); // member wait is 0 by default and some value if it is an event from a recorded macro
       m_MacroProcessor.DispatchEvent(e);
       m_PlatformAPI->DispatchEvent(e);

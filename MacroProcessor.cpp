@@ -89,7 +89,7 @@ void MacroProcessor::executeMacro(uint8_t macro)
   {
     
     Event e = m_EventQueue->dequeue();
-    InputHandler::GetEventQueue().putQ(e);
+    InputHandler::GetEventQueue().enqueue(e);
     m_EventQueue->enqueue(e);
 
   }
