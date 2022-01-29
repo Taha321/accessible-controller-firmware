@@ -10,5 +10,6 @@ struct Event // represents a button press/release
     };
     type eventType;
     uint8_t code;
+    unsigned long wait = 0; 
     bool Handled = false;
 };

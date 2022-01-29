@@ -56,22 +56,29 @@ void MacroProcessor::DispatchEvent(Event& e)
 
 void MacroProcessor::recordEvent(Event& e)
 {
+
   if(e.code == keycode::Macro1) return;
   if(e.code == keycode::Record_Macro)
   { 
     m_State = State::IDLE;
-    Serial.println("RECORDING STOPPED");  //For debugging
+    Serial.println("RECORDING STOPPED");  // For debugging
   }
-  else 
+  else {
+    
+    unsigned long currentEventTime = millis();
+    e.wait = currentEventTime - m_LastEventTime;
+    m_LastEventTime = currentEventTime; // Set to the clocked currentEventTime
     m_EventQueue->enqueue(e);
+  }
 }
 
 void MacroProcessor::startRecording()
 {
   while(!m_EventQueue->isEmpty())
     m_EventQueue->dequeue();
+  m_LastEventTime = millis();
   m_State = State::RECORDING;
-  Serial.println("RECORDING STARTED");  //For debugging
+  Serial.println("RECORDING STARTED");  // For debugging
 }
 
 
@@ -80,8 +87,10 @@ void MacroProcessor::executeMacro(uint8_t macro)
   uint8_t size = m_EventQueue->count();   
   for(uint8_t i = 0; i < size; i++) 
   {
+    
     Event e = m_EventQueue->dequeue();
     InputHandler::GetEventQueue().putQ(e);
     m_EventQueue->enqueue(e);
+
   }
 }

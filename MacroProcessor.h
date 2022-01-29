@@ -25,6 +25,7 @@ class MacroProcessor
     };  
     QueueArray<Event>* m_EventQueue;
     State m_State = IDLE;
+    unsigned long m_LastEventTime; 
 };
 
 #endif
