@@ -48,6 +48,10 @@ void MacroProcessor::DispatchEvent(Event& e)
     }
     if(e.Handled == true)   //For debugging
     {
+       Serial.print("sizeof(m_EventQueue)=");
+       Serial.println(sizeof(m_EventQueue));
+       Serial.print("Current Macro's Queue Size = ");
+       Serial.println(m_EventQueue->count());
        Serial.print("Handled event = ");
        Serial.println(e.code);
     }  
@@ -58,16 +62,18 @@ void MacroProcessor::recordEvent(Event& e)
 {
 
   if(e.code == keycode::Macro1) return;
-  if(e.code == keycode::Record_Macro)
+  if(e.code == keycode::Record_Macro || m_EventQueue->count() == MAX_SIZE)
   { 
     m_State = State::IDLE;
     Serial.println("RECORDING STOPPED");  // For debugging
   }
   else {
-    
     unsigned long currentEventTime = millis();
     e.wait = currentEventTime - m_LastEventTime;
     m_LastEventTime = currentEventTime; // Set to the clocked currentEventTime
+    Serial.print("Enqueuing event = ");
+    Serial.println(e.code);
+
     m_EventQueue->enqueue(e);
   }
 }

@@ -1,6 +1,6 @@
 #ifndef _MACROPROCESSOR_H
 #define _MACROPROCESSOR_H
-
+#define MAX_SIZE  128  // The maximum number of Events which can exist on the Macro Queue.
 #include "Event.h"
 #include "KeyCode.h"
 
