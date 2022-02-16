@@ -2,10 +2,14 @@
 #define _INPUTHANDLER_H
 
 #include <Arduino.h>
+
 #include "Event.h"
 #include "KeyCode.h"
 #include "QueueArray.h"
-enum class JoyStickType {
+
+
+enum class JoyStickType 
+{
     None = 0,
     Left,
     Right

@@ -20,5 +20,4 @@ void PlatformAPI::DispatchEvent(Event& e)
   }
 }
 
-
 PlatformAPIType PlatformAPI::s_CurrentAPI = PlatformAPIType::None;
