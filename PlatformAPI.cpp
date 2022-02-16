@@ -20,20 +20,4 @@ void PlatformAPI::DispatchEvent(Event& e)
   }
 }
 
-static PlatformAPI* InitPlatformAPI()
-{
-  switch(PlatformAPI::Current())
-  {
-      case PlatformAPIType::XInput:
-        return new XInputAPI(); 
-        
-      case PlatformAPIType::None:
-        PlatformAPI::SetAPI(PlatformAPIType::XInput);
-        return new XInputAPI(); 
-      
-      default:
-        assert(false);
-  }
-}
-
 PlatformAPIType PlatformAPI::s_CurrentAPI = PlatformAPIType::None;

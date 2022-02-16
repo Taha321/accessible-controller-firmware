@@ -3,7 +3,7 @@
 
 struct Event // represents a button press/release 
 {
-    enum type
+    enum type : uint8_t
     {
         Press,
         Release

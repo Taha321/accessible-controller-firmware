@@ -1,10 +1,26 @@
+#include "assert.h"
 #include "InputHandler.h"
 #include "MacroProcessor.h"
-#include "PlatformAPI.h"
+#include "XInputAPI.h"
 
+PlatformAPI* InitPlatformAPI()
+{
+  switch(PlatformAPI::Current())
+  {
+      case PlatformAPIType::XInput:
+        return new XInputAPI(); 
+        
+      case PlatformAPIType::None:
+        PlatformAPI::SetAPI(PlatformAPIType::XInput);
+        return new XInputAPI(); 
+      
+      default:
+        assert(false);
+  }
+}
 
-MacroProcessor MacroProcessor();
-PlatformAPI* PlatformAPI = InitPlatformAPI();
+MacroProcessor macroProcessor;
+PlatformAPI* platformAPI = InitPlatformAPI();
 
 void setup()
 {
@@ -20,12 +36,12 @@ void loop()
    {
      Event e = InputHandler::GetEventQueue().dequeue();
      delay(e.wait);                                           // member wait is 0 by default and some value if it is an event from a recorded macro
-     MacroProcessor.DispatchEvent(e);
-     PlatformAPI->DispatchEvent(e);
+     macroProcessor.DispatchEvent(e);
+     platformAPI->DispatchEvent(e);
    
      if(e.Handled == false)                                   //Debugging
        Serial.println("EVENT NOT HANDLED");
     }
-    m_PlatformAPI->SetJoyStick(JoyStickType::Right, InputHandler::GetRightAnalog().x, InputHandler::GetRightAnalog().y);
-    m_PlatformAPI->SetJoyStick(JoyStickType::Left, InputHandler::GetLeftAnalog().x, InputHandler::GetLeftAnalog().y);
+    platformAPI->SetJoyStick(JoyStickType::Right, InputHandler::GetRightAnalog().x, InputHandler::GetRightAnalog().y);
+    platformAPI->SetJoyStick(JoyStickType::Left, InputHandler::GetLeftAnalog().x, InputHandler::GetLeftAnalog().y);
 }

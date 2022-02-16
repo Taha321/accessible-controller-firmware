@@ -7,6 +7,9 @@
 #include "EventProcessor.h"
 
 
+
+
+
 class MacroProcessor : public EventProcessor
 {
   private:  
@@ -31,5 +34,6 @@ class MacroProcessor : public EventProcessor
     State m_State = IDLE;
     unsigned long int m_LastEventTime; 
 };
+
 
 #endif
