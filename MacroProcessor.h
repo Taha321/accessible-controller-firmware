@@ -1,6 +1,5 @@
 #ifndef _MACROPROCESSOR_H
 #define _MACROPROCESSOR_H
-
 #include "Event.h"
 #include "KeyCode.h"
 
@@ -18,6 +17,7 @@ class MacroProcessor : public EventProcessor
       IDLE = 0,
       RECORDING,
     };
+
   public:
     MacroProcessor();
     virtual ~MacroProcessor();  
