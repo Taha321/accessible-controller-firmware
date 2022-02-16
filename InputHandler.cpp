@@ -17,7 +17,7 @@ InputHandler::InputHandler()
     void (*ISR[])() = { ISR_PressA,ISR_PressB,ISR_PressX,ISR_PressY,ISR_PressRIGHT,ISR_PressLEFT,ISR_PressUP,ISR_PressDOWN,ISR_PressLT,ISR_PressRT,ISR_PressMacroRecording,ISR_PressMacro1 };
     for (uint8_t key = 0; key < s_NumButtons; key++)
     {
-        pinMode(s_Instance->m_PinAssignments[key], INPUT_PULLDOWN);
+        pinMode(s_Instance->m_PinAssignments[key], INPUT);
         attachInterrupt(s_Instance->m_PinAssignments[key], ISR[key], RISING);
     }
     
