@@ -2,7 +2,7 @@
 #include "InputHandler.h"
 #include "MacroProcessor.h"
 #include "XInputAPI.h"
-
+#include "EEPROM.h"
 PlatformAPI* InitPlatformAPI()
 {
   switch(PlatformAPI::Current())

@@ -27,6 +27,9 @@ class MacroProcessor : public EventProcessor
     void executeMacro(uint8_t macro);
     void recordEvent(Event& e);
     void startRecording();
+    void readMacro(uint8_t macroNumber);
+    void writeMacro(uint8_t macroNumber);
+
     
   private:
     static constexpr uint8_t MAX_SIZE = 128;
