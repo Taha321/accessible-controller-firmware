@@ -3,13 +3,13 @@
 
 struct Event // represents a button press/release 
 {
-    enum type
+    enum type : uint8_t
     {
         Press,
-        Release,
+        Release
     };
     type eventType;
     uint8_t code;
-    unsigned long wait = 0; 
+    uint16_t wait = 0; 
     bool Handled = false;
 };
