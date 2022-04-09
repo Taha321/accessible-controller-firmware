@@ -1,7 +1,7 @@
-#include "QueueArray.h"
 #include "MacroProcessor.h"
 #include "InputHandler.h"
 #include "EEPROM.h"
+
 #define MACRO_MAX_SIZE 128*6 + 1
 // Technically this may wear out the EEPROM but we need to define where they start and end.
 #define LARGEST_EEPROM_ADDRESS 2047
@@ -9,7 +9,7 @@
 MacroProcessor::MacroProcessor() 
 {
   Serial.begin(9600); // For debugging
-  m_EventQueue = new QueueArray<Event>();
+  m_EventQueue = new Queue<Event>();
   //TO DO: load macros from storage
   readMacro(1);
 
@@ -17,7 +17,6 @@ MacroProcessor::MacroProcessor()
 
 MacroProcessor::~MacroProcessor()
 {
-  
   writeMacro(1);
   while (!m_EventQueue->isEmpty())
     m_EventQueue->dequeue();
@@ -65,6 +64,52 @@ void MacroProcessor::DispatchEvent(Event& e)
   } 
 }
 
+void MacroProcessor::recordEvent(Event& e)
+{
+
+  if(e.code == keycode::Macro1) return;
+  if(e.code == keycode::Record_Macro || m_EventQueue->count() == MAX_SIZE)
+  { 
+    m_State = State::IDLE;
+    Serial.println("RECORDING STOPPED");  // For debugging
+    writeMacro(1);
+  }
+  else {
+    unsigned long currentEventTime = millis();
+    if(!m_EventQueue->isEmpty())
+      e.wait = currentEventTime - m_LastEventTime;
+      
+    m_LastEventTime = currentEventTime; // Set to the clocked currentEventTime
+    m_EventQueue->enqueue(e);
+  }
+}
+
+void MacroProcessor::startRecording()
+{
+  while(!m_EventQueue->isEmpty())
+    m_EventQueue->dequeue();
+    
+  m_LastEventTime = millis();
+  m_State = State::RECORDING;
+  Serial.println(m_EventQueue->count()); 
+  Serial.println("RECORDING STARTED");  // For debugging
+}
+
+
+void MacroProcessor::executeMacro(uint8_t macro)
+{
+  uint8_t size = m_EventQueue->count();   
+  Serial.print("Size of event queue in execution fxn ");
+  Serial.println(size);
+  
+  for(uint8_t i = 0; i < size; i++) 
+  {
+    Event e = m_EventQueue->dequeue();
+    InputHandler::GetEventQueue().enqueue(e);
+    m_EventQueue->enqueue(e);
+
+  }
+}
 
 void MacroProcessor::writeMacro(uint8_t macroNumber) {
     /* 
@@ -116,53 +161,4 @@ void MacroProcessor::readMacro(uint8_t macroNumber) {
         m_EventQueue->enqueue(e);
         address += eventSize;
     }
-
-
-}
-
-
-void MacroProcessor::recordEvent(Event& e)
-{
-
-  if(e.code == keycode::Macro1) return;
-  if(e.code == keycode::Record_Macro || m_EventQueue->count() == MAX_SIZE)
-  { 
-    m_State = State::IDLE;
-    Serial.println("RECORDING STOPPED");  // For debugging
-    writeMacro(1);
-
-  }
-  else {
-    unsigned long currentEventTime = millis();
-    e.wait = currentEventTime - m_LastEventTime;
-    m_LastEventTime = currentEventTime; // Set to the clocked currentEventTime
-
-
-    m_EventQueue->enqueue(e);
-  }
-}
-
-void MacroProcessor::startRecording()
-{
-  while(!m_EventQueue->isEmpty())
-    m_EventQueue->dequeue();
-  m_LastEventTime = millis();
-  m_State = State::RECORDING;
-  Serial.println("RECORDING STARTED");  // For debugging
-}
-
-
-void MacroProcessor::executeMacro(uint8_t macro)
-{
-  uint8_t size = m_EventQueue->count();   
-  Serial.print("Size of event queue in execution fxn ");
-  Serial.println(size);
-  
-  for(uint8_t i = 0; i < size; i++) 
-  {
-    Event e = m_EventQueue->dequeue();
-    InputHandler::GetEventQueue().enqueue(e);
-    m_EventQueue->enqueue(e);
-
-  }
 }

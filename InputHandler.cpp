@@ -109,4 +109,4 @@ void InputHandler::ISR_ReleaseLT() { attachInterrupt(s_Instance->m_PinAssignment
 void InputHandler::ISR_PressRT() { attachInterrupt(s_Instance->m_PinAssignments[RT], ISR_ReleaseRT, FALLING); buttonPress(RT); }
 void InputHandler::ISR_ReleaseRT() { attachInterrupt(s_Instance->m_PinAssignments[RT], ISR_PressRT, RISING); buttonRelease(RT); }
 
-QueueArray<Event> InputHandler::s_EventQueue = QueueArray<Event>();
+Queue<Event> InputHandler::s_EventQueue = Queue<Event>();

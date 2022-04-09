@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 
 template <typename T>
 class Queue
@@ -23,52 +22,6 @@ private:
 
 public:
 	Queue() = default;
-	Queue( Queue& source)
-	{
-		delete m_Front;
-		m_Front = nullptr;
-		m_Back = nullptr;
-		
-		node* currentNode = source.m_Front;
-		for (int i = 0; i < source.Size(); i++)
-		{
-			Enqueue(currentNode->item);
-			currentNode = currentNode->nextItem;
-		}
-	}
-	Queue& operator= ( Queue& source)
-	{
-		delete m_Front;
-		m_Front = nullptr;
-		m_Back = nullptr;
-		node* currentNode = source.m_Front;
-		for (int i = 0; i < source.Size(); i++)
-		{
-			Enqueue(currentNode->item);
-			currentNode = currentNode->nextItem;
-		}
-		
-		return *this;
-	}
-	Queue(Queue&& source) noexcept
-	{
-		m_Size = source.m_Size;
-		m_Front = source.m_Front;
-		m_Back = source.m_Back;
-		source.m_Front = nullptr;
-		source.m_Back = nullptr;
-	}
-
-	Queue& operator= (Queue&& source) noexcept
-	{
-		m_Size = source.m_Size;
-		m_Front = source.m_Front;
-		m_Back = source.m_Back;
-		source.m_Front = nullptr;
-		source.m_Back = nullptr;
-		return this;
-	}
-
 	~Queue()
 	{
 		delete m_Front;
@@ -76,7 +29,7 @@ public:
 		m_Back = nullptr;
 	}
 
-	void Enqueue(const T& newItem) 
+	void enqueue(const T& newItem) 
 	{
 		node* newNode = new node(newItem);
 		if (m_Back != nullptr)
@@ -88,11 +41,56 @@ public:
 		m_Back = newNode;
 		m_Size++;
 	}
-	bool Dequeue(T& container)
+ Queue( Queue& source)
+ {
+    delete m_Front;
+    m_Front = nullptr;
+    m_Back = nullptr;
+    
+    node* currentNode = source.m_Front;
+    for (int i = 0; i < source.Size(); i++)
+    {
+      Enqueue(currentNode->item);
+      currentNode = currentNode->nextItem;
+    }
+  }
+  Queue& operator= ( Queue& source)
+  {
+    delete m_Front;
+    m_Front = nullptr;
+    m_Back = nullptr;
+    node* currentNode = source.m_Front;
+    for (int i = 0; i < source.Size(); i++)
+    {
+      Enqueue(currentNode->item);
+      currentNode = currentNode->nextItem;
+    }
+    
+    return *this;
+  }
+  Queue(Queue&& source) noexcept
+  {
+    m_Size = source.m_Size;
+    m_Front = source.m_Front;
+    m_Back = source.m_Back;
+    source.m_Front = nullptr;
+    source.m_Back = nullptr;
+  }
+
+  Queue& operator= (Queue&& source) noexcept
+  {
+    m_Size = source.m_Size;
+    m_Front = source.m_Front;
+    m_Back = source.m_Back;
+    source.m_Front = nullptr;
+    source.m_Back = nullptr;
+    return this;
+  }
+	T dequeue()
 	{
 		if (m_Front != nullptr)
 		{
-			container = m_Front->item;
+			T frontItem = m_Front->item;
 			node* temp = m_Front;
 			m_Front = temp->nextItem;
 			if (m_Front == nullptr)
@@ -101,17 +99,18 @@ public:
 			temp->nextItem = nullptr;
 			delete temp;
 			m_Size--;
-			return true;
+			return frontItem;
 		}
-		return false;
+    T dummy;
+		return dummy;
 	}
 
-	bool IsEmpty()
+	bool isEmpty()
 	{
 		return !m_Size;
 	}
 
-	int Size()
+	int count()
 	{
 		return m_Size;
 	}
@@ -121,4 +120,3 @@ private:
 	node* m_Front = nullptr;
 	node* m_Back = nullptr;
 };
-
