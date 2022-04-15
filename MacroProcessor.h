@@ -1,8 +1,9 @@
 #ifndef _MACROPROCESSOR_H
 #define _MACROPROCESSOR_H
+
 #include "Event.h"
 #include "KeyCode.h"
-
+#include "Queue.h"
 #include "EventProcessor.h"
 
 
@@ -29,11 +30,10 @@ class MacroProcessor : public EventProcessor
     void startRecording();
     void readMacro(uint8_t macroNumber);
     void writeMacro(uint8_t macroNumber);
-
-    
+        
   private:
     static constexpr uint8_t MAX_SIZE = 128;
-    QueueArray<Event>* m_EventQueue;
+    Queue<Event>* m_EventQueue;
     State m_State = IDLE;
     unsigned long int m_LastEventTime; 
 };
